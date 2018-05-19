@@ -114,6 +114,21 @@ public class RabbitMQMessageReceiver {
                     RabbitMQUtils.getTransportHeaders(message),
                     soapAction,
                     contentType);
+            
+            
+            /**
+                If the variable SET_ROLLBACK_ONLY exists then it should not return true because 
+                he send ack to RabbitMQ, he must send it only in the case the variable don't exist
+            */
+            Object o = msgContext.getProperty(BaseConstants.SET_ROLLBACK_ONLY);
+            if (o != null) {
+                if ((o instanceof Boolean && ((Boolean) o)) ||
+                    (o instanceof String && Boolean.valueOf((String) o))) {
+                    return false;
+                }
+            }
+            
+            
         } catch (AxisFault axisFault) {
             log.error("Error when trying to read incoming message ...", axisFault);
             return false;
